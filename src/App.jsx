@@ -28,26 +28,26 @@ const C = {
 
 // ── Storage ────────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY_CHARS  = 'rpg_chars_v1';
-const STORAGE_KEY_ACTIVE = 'rpg_active_v1';
+const LS_CHARS  = 'rpg_chars_v1';
+const LS_ACTIVE = 'rpg_active_v1';
 
-const loadStorage = async () => {
+const loadStorage = () => {
   try {
-    const c = await window.storage.get(STORAGE_KEY_CHARS);
-    const a = await window.storage.get(STORAGE_KEY_ACTIVE);
+    const raw    = localStorage.getItem(LS_CHARS);
+    const active = localStorage.getItem(LS_ACTIVE);
     return {
-      chars:  c ? JSON.parse(c.value) : [],
-      active: a ? (parseInt(a.value) || 0) : 0,
+      chars:  raw    ? JSON.parse(raw) : [],
+      active: active ? (parseInt(active, 10) || 0) : 0,
     };
   } catch {
     return { chars: [], active: 0 };
   }
 };
 
-const saveStorage = async (chars, active) => {
+const saveStorage = (chars, active) => {
   try {
-    await window.storage.set(STORAGE_KEY_CHARS,  JSON.stringify(chars));
-    await window.storage.set(STORAGE_KEY_ACTIVE, String(active));
+    localStorage.setItem(LS_CHARS,  JSON.stringify(chars));
+    localStorage.setItem(LS_ACTIVE, String(active));
   } catch {}
 };
 
@@ -147,11 +147,10 @@ export default function App() {
     const s = document.createElement('style');
     s.textContent = CSS;
     document.head.appendChild(s);
-    loadStorage().then(({ chars: c, active: a }) => {
-      setChars(c);
-      setActiveIdx(Math.min(a, Math.max(0, c.length - 1)));
-      setView(c.length > 0 ? 'play' : 'menu');
-    });
+    const { chars: c, active: a } = loadStorage();
+    setChars(c);
+    setActiveIdx(Math.min(a, Math.max(0, c.length - 1)));
+    setView(c.length > 0 ? 'play' : 'menu');
   }, []);
 
   const persist   = (nc, ni = activeIdx) => { setChars(nc); setActiveIdx(ni); saveStorage(nc, ni); };
