@@ -28,10 +28,13 @@ const C = {
 
 // ── Storage ────────────────────────────────────────────────────────────────────
 
+const STORAGE_KEY_CHARS  = 'rpg_chars_v1';
+const STORAGE_KEY_ACTIVE = 'rpg_active_v1';
+
 const loadStorage = async () => {
   try {
-    const c = await window.storage.get('rpg3_chars');
-    const a = await window.storage.get('rpg3_active');
+    const c = await window.storage.get(STORAGE_KEY_CHARS);
+    const a = await window.storage.get(STORAGE_KEY_ACTIVE);
     return {
       chars:  c ? JSON.parse(c.value) : [],
       active: a ? (parseInt(a.value) || 0) : 0,
@@ -43,8 +46,8 @@ const loadStorage = async () => {
 
 const saveStorage = async (chars, active) => {
   try {
-    await window.storage.set('rpg3_chars', JSON.stringify(chars));
-    await window.storage.set('rpg3_active', String(active));
+    await window.storage.set(STORAGE_KEY_CHARS,  JSON.stringify(chars));
+    await window.storage.set(STORAGE_KEY_ACTIVE, String(active));
   } catch {}
 };
 
@@ -448,9 +451,13 @@ function BodyPart({ bp, label, gridStyle, onClick, onToggle }) {
       onClick={onClick}
       style={{
         ...gridStyle,
-        background: info.bg, border:`2px solid ${info.border}`, borderRadius:10,
+        background:  info.bg,
+        border:      isShield ? '3px solid #a855f7' : `2px solid ${info.border}`,
+        borderRadius:10,
         display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:2,
-        boxShadow:`0 0 14px ${info.glow}, inset 0 0 10px ${info.glow}`,
+        boxShadow: isShield
+          ? `0 0 14px #a855f766, 0 0 0 1px #7c3aed, inset 0 0 10px #7c3aed22`
+          : `0 0 14px ${info.glow}, inset 0 0 10px ${info.glow}`,
         cursor:'pointer', padding:4, position:'relative', overflow:'hidden',
       }}
     >
